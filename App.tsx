@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Heart, Trophy, Zap, PlayCircle } from 'lucide-react';
+import { Heart, Trophy, Zap, PlayCircle, RotateCcw } from 'lucide-react';
 import useGameStore from './store';
 import { GameState } from './types';
 import { ParallaxBackground } from './components/ui/ParallaxBackground';
@@ -13,7 +13,23 @@ import { Level3Phrasal } from './components/levels/Level3Phrasal';
 import { Level4Conditional } from './components/levels/Level4Conditional';
 
 const App: React.FC = () => {
-  const { currentState, score, combo, lives, adrenalineMode, setGameState } = useGameStore();
+  const { 
+    currentState, 
+    score, 
+    combo, 
+    lives, 
+    adrenalineMode, 
+    setGameState, 
+    startNewGame, 
+    resumeGame, 
+    init, 
+    hasSave,
+    highScore
+  } = useGameStore();
+
+  useEffect(() => {
+    init();
+  }, [init]);
 
   return (
     <div className="relative w-full h-screen overflow-hidden font-sans text-slate-100">
@@ -76,17 +92,35 @@ const App: React.FC = () => {
                <h1 className="text-6xl md:text-8xl font-serif text-adventure-gold mb-4 drop-shadow-[0_4px_4px_rgba(0,0,0,0.8)] tracking-wider">
                  UNCHARTED
                </h1>
-               <h2 className="text-2xl md:text-3xl font-sans text-adventure-teal mb-12 uppercase tracking-[0.2em]">
+               <h2 className="text-2xl md:text-3xl font-sans text-adventure-teal mb-8 uppercase tracking-[0.2em]">
                  The Lexicon Expedition
                </h2>
-               <button 
-                 onClick={() => setGameState(GameState.LEVEL_1_AUCTION)}
-                 className="group relative px-12 py-6 bg-slate-900 border-2 border-adventure-gold text-adventure-gold text-2xl font-bold uppercase tracking-widest hover:bg-adventure-gold hover:text-black transition-all duration-300 shadow-[0_0_30px_rgba(255,183,3,0.2)]"
-               >
-                 <span className="flex items-center gap-4">
-                   Start Expedition <PlayCircle className="w-8 h-8 group-hover:scale-110 transition-transform" />
-                 </span>
-               </button>
+               
+               {highScore > 0 && (
+                   <div className="text-adventure-cream/60 mb-8 font-serif">High Score: {highScore}</div>
+               )}
+
+               <div className="flex flex-col gap-4 items-center">
+                   {hasSave && (
+                       <button 
+                         onClick={resumeGame}
+                         className="w-80 px-8 py-4 bg-adventure-teal/20 border-2 border-adventure-teal text-adventure-teal text-xl font-bold uppercase tracking-widest hover:bg-adventure-teal hover:text-white transition-all duration-300 backdrop-blur-sm"
+                       >
+                         <span className="flex items-center justify-center gap-4">
+                           Resume <RotateCcw className="w-6 h-6" />
+                         </span>
+                       </button>
+                   )}
+
+                   <button 
+                     onClick={startNewGame}
+                     className="group relative w-80 px-8 py-4 bg-slate-900/80 border-2 border-adventure-gold text-adventure-gold text-xl font-bold uppercase tracking-widest hover:bg-adventure-gold hover:text-black transition-all duration-300 shadow-[0_0_30px_rgba(255,183,3,0.2)]"
+                   >
+                     <span className="flex items-center justify-center gap-4">
+                       New Expedition <PlayCircle className="w-8 h-8 group-hover:scale-110 transition-transform" />
+                     </span>
+                   </button>
+               </div>
              </motion.div>
           )}
 
@@ -133,7 +167,7 @@ const App: React.FC = () => {
                  onClick={() => window.location.reload()}
                  className="px-8 py-3 bg-adventure-teal text-white rounded hover:bg-white hover:text-adventure-teal font-bold transition-colors"
                >
-                 Play Again
+                 Return to Menu
                </button>
             </motion.div>
           )}
@@ -147,12 +181,22 @@ const App: React.FC = () => {
             >
               <h1 className="text-6xl font-serif text-white mb-6">Expedition Failed</h1>
               <p className="text-xl text-red-200 mb-8">The treasure remains lost.</p>
-              <button 
-                 onClick={() => window.location.reload()}
-                 className="px-8 py-3 border-2 border-white text-white rounded hover:bg-white hover:text-red-900 font-bold transition-colors"
-               >
-                 Try Again
-               </button>
+              <div className="flex flex-col gap-4">
+                  {hasSave && (
+                       <button 
+                         onClick={resumeGame}
+                         className="px-8 py-3 bg-white text-red-900 rounded hover:bg-red-100 font-bold transition-colors"
+                       >
+                         Retry Level
+                       </button>
+                  )}
+                  <button 
+                     onClick={() => window.location.reload()}
+                     className="px-8 py-3 border-2 border-white text-white rounded hover:bg-white hover:text-red-900 font-bold transition-colors"
+                   >
+                     Menu
+                   </button>
+               </div>
             </motion.div>
           )}
         </AnimatePresence>

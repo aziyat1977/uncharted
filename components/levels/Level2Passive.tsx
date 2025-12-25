@@ -33,12 +33,19 @@ export const Level2Passive: React.FC = () => {
       <p className="text-xl text-adventure-cream mb-8 font-sans bg-black/50 px-4 py-2 rounded">Arrrange the stones: Passive Voice</p>
       
       <Reorder.Group axis="y" values={items} onReorder={setItems} className="flex flex-col gap-6">
-        {items.map((item) => (
+        {items.map((item, idx) => (
           <Reorder.Item key={item} value={item} className="cursor-grab active:cursor-grabbing">
             <motion.div
               layout
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
+              // Subtle floating rotation for "ancient magic" feel
+              animate={{ rotate: [0, 0.5, -0.5, 0] }}
+              transition={{ 
+                duration: 4 + idx, 
+                repeat: Infinity, 
+                ease: "easeInOut" 
+              }}
               className="w-[400px] h-[80px] bg-[#3d342b] border-2 border-[#5c4d3c] rounded-lg shadow-2xl flex items-center justify-center relative overflow-hidden group"
             >
               {/* Stone Texture Effect */}

@@ -78,11 +78,19 @@ export const Level3Phrasal: React.FC = () => {
         </h2>
 
         <div className="grid grid-cols-3 gap-6">
-          {questions[questionIdx].options.map((opt) => (
+          {questions[questionIdx].options.map((opt, idx) => (
             <motion.button
               key={opt}
               whileHover={{ scale: 1.1, backgroundColor: "rgba(255,255,255,0.2)" }}
               whileTap={{ scale: 0.9 }}
+              // Pulsing animation
+              animate={{ scale: [1, 1.02, 1] }}
+              transition={{ 
+                duration: 1.5, 
+                repeat: Infinity, 
+                ease: "easeInOut",
+                delay: idx * 0.2 
+              }}
               onClick={(e) => handleAnswer(opt, e)}
               className="h-32 bg-sky-900/80 border-2 border-sky-400 rounded-xl text-3xl font-black text-sky-100 shadow-lg hover:shadow-sky-500/50 transition-all uppercase tracking-widest"
             >

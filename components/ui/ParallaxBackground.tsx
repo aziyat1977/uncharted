@@ -9,14 +9,16 @@ export const ParallaxBackground: React.FC = () => {
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
 
-  const springConfig = { damping: 25, stiffness: 150 };
+  // Heavier, more cinematic physics
+  const springConfig = { damping: 40, stiffness: 90 }; 
   const springX = useSpring(mouseX, springConfig);
   const springY = useSpring(mouseY, springConfig);
 
-  const moveX = useTransform(springX, [-0.5, 0.5], [-20, 20]);
-  const moveY = useTransform(springY, [-0.5, 0.5], [-20, 20]);
-  const moveXLayer2 = useTransform(springX, [-0.5, 0.5], [-50, 50]);
-  const moveYLayer2 = useTransform(springY, [-0.5, 0.5], [-50, 50]);
+  // Multiple parallax planes
+  const moveXMap = useTransform(springX, [-0.5, 0.5], [-25, 25]);
+  const moveYMap = useTransform(springY, [-0.5, 0.5], [-25, 25]);
+  const moveXBg = useTransform(springX, [-0.5, 0.5], [-45, 45]);
+  const moveYBg = useTransform(springY, [-0.5, 0.5], [-45, 45]);
 
   useEffect(() => {
     const handleMove = (e: MouseEvent) => {
@@ -28,70 +30,59 @@ export const ParallaxBackground: React.FC = () => {
     return () => window.removeEventListener('mousemove', handleMove);
   }, [mouseX, mouseY]);
 
-  let bgClass = "bg-slate-900";
-  let Elements = null;
+  // Cinematic Location Mapping
+  const bgImages: Record<string, string> = {
+    [GameState.MENU]: "https://images.unsplash.com/photo-1577083552431-6e5fd01988ec?q=80&w=2560&auto=format&fit=crop", // Antique map table / Study
+    [GameState.LEVEL_1_AUCTION]: "https://images.unsplash.com/photo-1545562083-c6834db51138?q=80&w=2560&auto=format&fit=crop", // Dark Museum/Auction Hall
+    [GameState.LEVEL_2_CRYPT]: "https://images.unsplash.com/photo-1518182170546-07661bf9a526?q=80&w=2560&auto=format&fit=crop", // Stone Catacombs
+    [GameState.LEVEL_3_PLANE]: "https://images.unsplash.com/photo-1536514072410-5019a3c69182?q=80&w=2560&auto=format&fit=crop", // High Altitude Clouds
+    [GameState.LEVEL_4_SHIPS]: "https://images.unsplash.com/photo-1516912481808-542336639844?q=80&w=2560&auto=format&fit=crop", // Sea Cave / Pirate Water
+    [GameState.VICTORY]: "https://images.unsplash.com/photo-1533613220915-609f661a6fe1?q=80&w=2560&auto=format&fit=crop", // Gold / Sunset
+    [GameState.GAME_OVER]: "https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?q=80&w=2560&auto=format&fit=crop", // Dark textured defeat
+  };
 
-  switch (currentState) {
-    case GameState.LEVEL_1_AUCTION:
-      bgClass = "bg-[#0f1014]"; // Dark Museum
-      Elements = (
-        <>
-           {/* Spotlights */}
-           <motion.div style={{ x: moveX, y: moveY }} className="absolute top-0 left-1/4 w-[200px] h-[600px] bg-yellow-100/5 blur-[100px] rotate-12" />
-           <motion.div style={{ x: moveX, y: moveY }} className="absolute top-0 right-1/4 w-[200px] h-[600px] bg-yellow-100/5 blur-[100px] -rotate-12" />
-        </>
-      );
-      break;
-    case GameState.LEVEL_2_CRYPT:
-      bgClass = "bg-[#1a1410]"; // Dark Brown Crypt
-      Elements = (
-        <>
-            <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stone-wall.png')] opacity-20" />
-            <motion.div style={{ x: moveXLayer2, y: moveYLayer2 }} className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80" />
-             {/* Dust motes would go here in a complex particle system */}
-        </>
-      );
-      break;
-    case GameState.LEVEL_3_PLANE:
-        bgClass = "bg-sky-400";
-        Elements = (
-            <>
-                <motion.div 
-                    animate={{ x: [-1000, 1000] }} 
-                    transition={{ repeat: Infinity, duration: 20, ease: "linear" }}
-                    className="absolute top-1/2 left-0 w-[200vw] h-[400px] bg-white/30 blur-[60px]" 
-                />
-                <motion.div style={{ x: moveX, y: moveY }} className="absolute inset-0 bg-gradient-to-b from-sky-600 to-sky-200 opacity-90" />
-            </>
-        )
-        break;
-     case GameState.LEVEL_4_SHIPS:
-        bgClass = "bg-indigo-900";
-        Elements = (
-            <>
-                <motion.div style={{ x: moveXLayer2 }} className="absolute bottom-0 w-full h-[30vh] bg-blue-800/50 blur-xl" />
-                <motion.div 
-                    animate={{ y: [0, 20, 0] }}
-                    transition={{ repeat: Infinity, duration: 5, ease: "easeInOut" }}
-                    className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10" 
-                />
-            </>
-        )
-        break;
-    default:
-      // Menu
-      bgClass = "bg-[#0b0c10]";
-      Elements = (
-          <motion.div style={{ x: moveX, y: moveY }} className="absolute inset-0 opacity-20">
-              <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-adventure-gold/20 via-transparent to-transparent" />
-          </motion.div>
-      );
-  }
+  // Fallback to menu if state not found
+  const activeBg = bgImages[currentState] || bgImages[GameState.MENU];
+
+  // The "Magellan" Style Map Overlay (High Res Public Domain Map)
+  const mapOverlay = "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/World_Map_1689.JPG/2560px-World_Map_1689.JPG";
 
   return (
-    <div className={`fixed inset-0 -z-10 overflow-hidden transition-colors duration-1000 ${bgClass}`}>
-        {Elements}
-        <div className="absolute inset-0 pointer-events-none bg-journal-texture opacity-10 mix-blend-overlay" />
+    <div className="fixed inset-0 -z-10 overflow-hidden bg-black transition-colors duration-1000">
+        
+        {/* Layer 1: The Deep Background (Location) */}
+        <motion.div 
+            style={{ x: moveXBg, y: moveYBg, scale: 1.1 }}
+            className="absolute inset-0"
+        >
+             <div 
+                className="absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-in-out"
+                style={{ 
+                    backgroundImage: `url(${activeBg})`, 
+                    // Cinematic Dark Grading: Low brightness, slight sepia for "Adventure" feel
+                    filter: 'brightness(0.35) sepia(0.25) contrast(1.1) saturate(0.8)' 
+                }}
+             />
+        </motion.div>
+
+        {/* Layer 2: The "Real Map" Overlay */}
+        <motion.div 
+            style={{ x: moveXMap, y: moveYMap, scale: 1.2 }}
+            className="absolute inset-0 pointer-events-none mix-blend-overlay opacity-20"
+        >
+             <div 
+                className="absolute inset-0 bg-cover bg-center"
+                style={{ backgroundImage: `url(${mapOverlay})` }} 
+             />
+        </motion.div>
+
+        {/* Layer 3: Texture & Vignette */}
+        <div className="absolute inset-0 bg-journal-texture opacity-15 mix-blend-multiply pointer-events-none" />
+        
+        {/* Heavy Cinematic Vignette */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_20%,rgba(0,0,0,0.6)_60%,rgba(0,0,0,0.95)_100%)] pointer-events-none" />
+        
+        {/* Optional: subtle scanline/dust if desired, but keeping clean for now */}
     </div>
   );
 };

@@ -68,9 +68,19 @@ export const Level1Deduction: React.FC = () => {
             onClick={(e) => handleChoice(item.correct, e)}
             className="relative group bg-gradient-to-br from-slate-800 to-slate-900 border-2 border-slate-600 hover:border-adventure-gold p-8 rounded-2xl w-64 h-80 flex flex-col items-center justify-center gap-6 transition-all duration-300"
           >
-             <div className="text-adventure-teal group-hover:text-adventure-gold transition-colors duration-300 drop-shadow-[0_0_10px_rgba(33,158,188,0.5)]">
+             {/* Breathing Icon Animation */}
+             <motion.div 
+                animate={{ y: [0, -8, 0], scale: [1, 1.05, 1] }}
+                transition={{ 
+                  duration: 3 + idx, 
+                  repeat: Infinity, 
+                  ease: "easeInOut",
+                  delay: idx * 0.5 
+                }}
+                className="text-adventure-teal group-hover:text-adventure-gold transition-colors duration-300 drop-shadow-[0_0_10px_rgba(33,158,188,0.5)]"
+             >
                 {item.icon}
-             </div>
+             </motion.div>
              <span className="text-xl font-serif text-slate-300 group-hover:text-white">{item.name}</span>
           </motion.button>
         ))}
