@@ -1,0 +1,7 @@
+{
+  "name": "Uncharted: The Lexicon Expedition",
+  "description": "A cinematic, interactive language learning adventure game for B1+ students featuring kinetic UI, particle effects, and gamified grammar challenges.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
